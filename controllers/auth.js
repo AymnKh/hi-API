@@ -61,3 +61,45 @@ export async function register(req, res) {
     }
   });
 }
+export async function login(req, res) {
+  if (!req.body.user || !req.body.password)
+    return res.status(Http.BAD_REQUEST).json({
+      // if username or password is empty
+      message: "Username or password is empty",
+    });
+
+  const username = capitalize(req.body.user); // capitalize username
+  const email = req.body.user ? req.body.user.toLowerCase() : null; // lowercase email
+  User.findOne({ $or: [{ username: username }, { email: email }] })
+    .then((user) => {
+      if (!user) {
+        return res.status(Http.NOT_FOUND).json({
+          // if user not found
+          message: "User not found",
+        });
+      }
+      return Bcrypt.compare(req.body.password, user.password, (err, result) => {
+        if (!result) {
+          return res.status(Http.BAD_REQUEST).json({
+            // if error while comparing password
+            message: "password not correct",
+          });
+        }
+        const token = Jwt.sign({ user: result }, process.env.JWT_SECRET, {
+          expiresIn: "1d",
+        });
+        return res.status(Http.OK).json({
+          // if user logged in successfully
+          message: "User logged in successfully",
+          token: token,
+        });
+      });
+    })
+    .catch((err) => {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        // if error while finding user
+        message: "Error while finding user",
+        error: err._message,
+      });
+    });
+}
