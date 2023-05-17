@@ -79,6 +79,12 @@ export async function login(req, res) {
         });
       }
       return Bcrypt.compare(req.body.password, user.password, (err, result) => {
+        if (err) {
+          return res.status(Http.BAD_REQUEST).json({
+            // if error while comparing password
+            message: err.message,
+          });
+        }
         if (!result) {
           return res.status(Http.BAD_REQUEST).json({
             // if error while comparing password
