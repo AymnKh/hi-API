@@ -91,7 +91,7 @@ export async function login(req, res) {
             message: "password not correct",
           });
         }
-        const token = Jwt.sign({ user: result }, process.env.JWT_SECRET, {
+        const token = Jwt.sign({ userId:user._id , username:user.username }, process.env.JWT_SECRET, {
           expiresIn: "1d",
         });
         return res.status(Http.OK).json({

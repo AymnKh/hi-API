@@ -27,9 +27,16 @@ mongoose
     console.log(err); // if connection is unsuccessful
   });
 
+//jwt middleware
+import authJwt from "./helpers/jwt.js";
+app.use(authJwt());
+
 //auth middleware
 import authRoutes from "./routes/auth.js";
 app.use("/api", authRoutes);
+//post middleware
+import postRoutes from "./routes/post.js";
+app.use("/api/posts", postRoutes);
 
 const port = 3000;
 
