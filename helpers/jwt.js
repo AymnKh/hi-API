@@ -21,7 +21,7 @@ const authJwt = () => {
                 message: "Unauthorized",
               });
             }
-              req.user = decoded; // if the token is valid, set the user object in the request
+              req.user = decoded.user; // if the token is valid, set the user object in the request
           });
           return token; // return the token
         }

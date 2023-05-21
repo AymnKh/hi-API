@@ -2,10 +2,24 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+const app = express();
+// socket.io
+import http from "http";
+const server = http.createServer(app);
+import { Server } from "socket.io";
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  },
+});
 
+import { createSocketStream } from "./socket/streams.js";
+createSocketStream(io);
+
+//env
 dotenv.config();
 
-const app = express();
 
 //body parser
 app.use(express.json({ limit: "30mb", extended: true }));
@@ -41,6 +55,6 @@ app.use("/api/posts", postRoutes);
 const port = 3000;
 
 //connect to server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
