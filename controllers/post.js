@@ -54,3 +54,40 @@ export function getPosts(req, res) {
       });
     });
 } // getPosts function
+
+export function likePost(req, res) {
+  const postId = req.params.postId; // get the postId from the request params
+  Post.updateOne(
+    {
+      _id: postId,
+      "likes.username": {
+        $ne: req.user.username, // check if the username is not in the likes array
+      },
+    },
+    {
+      $push: {
+        likes: {
+          username: req.user.username, // push the username to the likes array
+        },
+      },
+      $inc: {
+        totalLikes: 1, // increment the totalLikes by 1
+      },
+    },
+    {
+      new: true,
+    }
+  )
+    .then((post) => {
+      return res.status(Http.OK).json({
+        message: "Post liked successfully", // return a success message
+        post: post,
+      });
+    })
+    .catch((err) => {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        message: "Error while liking post", // return an error message
+        error: err._message,
+      });
+    });
+} // like post function
