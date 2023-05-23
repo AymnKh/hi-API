@@ -39,7 +39,7 @@ export function addPost(req, res) {
         error: err._message,
       });
     });
-}
+} // addPost function
 export function getPosts(req, res) {
   Post.find({}) // get all posts
     .populate("userId") // populate the userId field with the username
@@ -91,3 +91,51 @@ export function likePost(req, res) {
       });
     });
 } // like post function
+
+export function addComment(req, res) {
+  const postId = req.params.postId; // get the postId from the request params
+  Post.updateOne(
+    { _id: postId },
+    {
+      $push: {
+        comments: {
+          userId: req.user.userId, // push the userId to the comments array
+          username: req.user.username, // push the username to the comments array
+          comment: req.body.comment, // push the comment to the comments array
+        },
+      },
+    },
+    {
+      new: true,
+    }
+  )
+    .then((post) => {
+      // update the post
+      return res.status(Http.OK).json({
+        message: "Comment added successfully", // return a success message
+        post: post,
+      });
+    })
+    .catch((err) => {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        message: "Error while adding comment", // return an error message
+        error: err._message,
+      });
+    });
+} // add comment function
+
+export function getPost(req, res) {
+  const postId = req.params.postId; // get the postId from the request params
+  Post.findOne({ _id: postId }) // get the post
+    .populate("userId") // populate the userId field with the username
+    .populate("comments.userId") // populate the comments userId field with the username
+    .then((post) => {
+      return res.status(Http.OK).json(post);
+    })
+    .catch((err) => {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching post", // return an error message
+        error: err._message,
+      });
+    });
+}

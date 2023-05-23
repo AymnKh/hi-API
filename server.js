@@ -51,6 +51,9 @@ app.use("/api", authRoutes);
 //post middleware
 import postRoutes from "./routes/post.js";
 app.use("/api/posts", postRoutes);
+//users middleware
+import userRoutes from "./routes/users.js";
+app.use("/api/users", userRoutes);
 
 const port = 3000;
 
