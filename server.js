@@ -54,6 +54,10 @@ app.use("/api/posts", postRoutes);
 //users middleware
 import userRoutes from "./routes/users.js";
 app.use("/api/users", userRoutes);
+//friends middleware
+import friendsRoutes from "./routes/friends.js";
+app.use("/api/friends", friendsRoutes);
+
 
 const port = 3000;
 

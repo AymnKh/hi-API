@@ -14,3 +14,23 @@ export function getAllUsers(req,res) {
       });
     });
 }
+export function getUser(req, res) {
+  const userId = req.params.id; // get the user Id from the request
+  User.findById(userId) // find the user by Id
+    .populate('following.followedUser')
+    .populate('followers.followerUser')
+    .populate('posts')
+    .then((user) => {
+      if (!user)
+        return res.status(Http.NOT_FOUND).json({ message: "No user found" }); // return error message
+      return res.status(Http.OK).json(user); // return the user
+    }
+  )
+    .catch((err) => {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching user", // return an error message
+        error: err._message, // return the error
+      });
+    }
+  );  
+}
