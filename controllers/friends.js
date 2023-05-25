@@ -13,6 +13,10 @@ export function followUser(req, res) {
         followers: {
           followerUser: req.user._id, // add the logged in user Id to the followers array
         },
+        notifications: {
+          senderId: req.user._id,
+          action: `${req.user.username} is now following you`,
+        },
       },
     }
   ) // find the user by Id
@@ -51,7 +55,7 @@ export function unfollowUser(req, res) {
         // remove the logged in user Id from the followers array
         followers: {
           followerUser: req.user._id, // remove the logged in user Id from the followers array
-        }
+        },
       },
     }
   )
@@ -73,10 +77,55 @@ export function unfollowUser(req, res) {
         }
       );
       res.status(Http.OK).json({ message: "User unfollowed successfully" }); // return success message
-    }
-  )
+    })
     .catch((err) => {
       res.status(Http.INTERNAL_SERVER_ERROR).json({ message: err.message }); // return error message
-    }
-  );
+    });
+}
+export async function markAsReadOrDelete(req, res) {
+  const notificationId = req.params.id; // get the notification Id from the request
+  if (!req.body.deleteIt) {
+    // check if the notification should be marked as read
+    await User.updateOne(
+      // find the user by Id and the notification Id
+      {
+        _id: req.user._id,
+        "notifications._id": notificationId,
+      },
+      {
+        $set: {
+          "notifications.$.read": true, // mark the notification as read
+        },
+      }
+    )
+      .then(() => {
+        res.status(Http.OK).json({ message: "Notification marked as read" }); // return success message
+      })
+      .catch((err) => {
+        res.status(Http.INTERNAL_SERVER_ERROR).json({ message: err.message }); // return error message
+      });
+  } else {
+    // if the notification should be deleted
+    await User.updateOne(
+      // find the user by Id and the notification Id
+      {
+        _id: req.user._id,
+        "notifications._id": notificationId,
+      },
+      {
+        $pull: {
+          notifications: {
+            // remove the notification from the notifications array
+            _id: notificationId,
+          },
+        },
+      }
+    )
+      .then(() => {
+        res.status(Http.OK).json({ message: "Notification deleted" }); // return success message
+      })
+      .catch((err) => {
+        res.status(Http.INTERNAL_SERVER_ERROR).json({ message: err.message }); // return error message
+      });
+  }
 }

@@ -41,6 +41,29 @@ const userSchema = mongoose.Schema({
             },
         }
     ],
+    notifications: [
+        {
+            senderId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+            action: {
+                type: String,
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now,
+            },
+            read: {
+                type: Boolean,
+                default: false,
+            },
+            viewProfile: {
+                type: Boolean,
+                default: false,
+            }
+        }
+    ]
 });
 
 const User = mongoose.model("User", userSchema);
