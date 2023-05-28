@@ -129,3 +129,26 @@ export async function markAsReadOrDelete(req, res) {
       });
   }
 }
+export function markAllAsRead(req, res) {
+  User.updateMany(
+    // find the user by Id
+    {
+      _id: req.user._id,
+    },
+    {
+      $set: {
+        "notifications.$[elem].read": true, // mark all notifications as read
+      },
+    },
+    {
+      arrayFilters: [{ "elem.read": false }], // filter the notifications array
+      multi: true,
+    }
+  )
+    .then(() => {
+      res.status(Http.OK).json({ message: "All notifications marked as read" }); // return success message
+    })
+    .catch((err) => {
+      res.status(Http.INTERNAL_SERVER_ERROR).json({ message: err.message }); // return error message
+    });
+}
