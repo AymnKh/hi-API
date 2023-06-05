@@ -57,6 +57,9 @@ app.use("/api/users", userRoutes);
 //friends middleware
 import friendsRoutes from "./routes/friends.js";
 app.use("/api/friends", friendsRoutes);
+//message middleware
+import messageRoutes from "./routes/message.js";
+app.use("/api", messageRoutes);
 
 
 const port = 3000;
