@@ -123,7 +123,7 @@ export async function sendMessage(req, res) {
 
 export async function getAllMessages(req, res) {
   const senderId = req.params.senderId;
-  const receiverId = req.params.receiverId;
+  const receiverId = req.params.recevierId;
   const conversation = await Conversation.findOne({
     $or: [
       {
@@ -144,6 +144,6 @@ export async function getAllMessages(req, res) {
     const message = await Message.findOne({
       conversationId: conversation._id,
     });
-    res.status(HttpStatus.OK).json({ message: "Message returned", message });
+    return res.status(Http.OK).json(message );
   }
 }

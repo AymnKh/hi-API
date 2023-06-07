@@ -15,7 +15,9 @@ const io = new Server(server, {
 });
 
 import { createSocketStream } from "./socket/streams.js";
+import { privateChat } from './socket/private-chat.js';
 createSocketStream(io);
+privateChat(io);
 
 //env
 dotenv.config();
