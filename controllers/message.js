@@ -123,7 +123,7 @@ export async function sendMessage(req, res) {
 
 export async function getAllMessages(req, res) {
   const senderId = req.params.senderId;
-  const receiverId = req.params.recevierId;
+  const receiverId = req.params.receiverId;
   const conversation = await Conversation.findOne({
     $or: [
       {
@@ -144,6 +144,46 @@ export async function getAllMessages(req, res) {
     const message = await Message.findOne({
       conversationId: conversation._id,
     });
-    return res.status(Http.OK).json(message );
+    return res.status(Http.OK).json(message);
+  }
+}
+
+export async function markAllAsRead(req, res) {
+  const senderId = req.params.senderId;
+  const receiverId = req.params.receiverId;
+  const conversation = await Conversation.findOne({
+    $or: [
+      {
+        $and: [
+          { "members.senderId": senderId },
+          { "members.receiverId": receiverId },
+        ],
+      },
+      {
+        $and: [
+          { "members.receiverId": senderId },
+          { "members.senderId": receiverId },
+        ],
+      },
+    ],
+  }).select("_id");
+  if (conversation) {
+    const message = await Message.findOne({
+      conversationId: conversation._id,
+    });
+   
+    try {
+      message.messages.forEach(async element => {
+        await Message.updateOne(
+          {
+            "messages._id": element._id,
+          },
+          { $set: { "messages.$.isRead": true } } //  $ first index match the query condition
+        );
+      })
+      return res.status(Http.OK).json({ message: "Messages marked as read" });
+    } catch (err) {
+     return res.status(Http.INTERNAL_SERVER_ERROR).json({ message: "Error occured" });
+    }
   }
 }
