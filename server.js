@@ -2,11 +2,15 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+
+import _ from 'lodash';
+
 const app = express();
 // socket.io
 import http from "http";
 const server = http.createServer(app);
 import { Server } from "socket.io";
+import User from "./helpers/userClass.js";
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -15,13 +19,12 @@ const io = new Server(server, {
 });
 
 import { createSocketStream } from "./socket/streams.js";
-import { privateChat } from './socket/private-chat.js';
-createSocketStream(io);
+import { privateChat } from "./socket/private-chat.js";
+createSocketStream(io, User, _);
 privateChat(io);
 
 //env
 dotenv.config();
-
 
 //body parser
 app.use(express.json({ limit: "30mb", extended: true }));
@@ -62,7 +65,6 @@ app.use("/api/friends", friendsRoutes);
 //message middleware
 import messageRoutes from "./routes/message.js";
 app.use("/api", messageRoutes);
-
 
 const port = 3000;
 
