@@ -1,81 +1,95 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
-    firstname: {
-        type: String,
+  firstname: {
+    type: String,
+  },
+  lastname: {
+    type: String,
+  },
+  email: {
+    type: String,
+    required: ["true", "Email is required"],
+  },
+  username: {
+    type: String,
+    required: ["true", "Username is required"],
+  },
+  password: {
+    type: String,
+    required: ["true", "Password is required"],
+  },
+  posts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
     },
-    lastname: {
-        type: String,
+  ],
+  following: [
+    {
+      followedUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     },
-    email: {
-        type: String,
-        required: ["true", "Email is required"],
+  ],
+  followers: [
+    {
+      followerUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     },
-    username: {
+  ],
+  notifications: [
+    {
+      senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      action: {
         type: String,
-        required: ["true", "Username is required"],
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      read: {
+        type: Boolean,
+        default: false,
+      },
+      viewProfile: {
+        type: Boolean,
+        default: false,
+      },
     },
-    password: {
+  ],
+  chatList: [
+    {
+      receiverId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      messageId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    },
+  ],
+  photoVersion: {
+    type: String,
+    default: "",
+  },
+  photoId: { type: String, default: "" },
+  photos: [
+    {
+      photoVersion: {
         type: String,
-        required: ["true", "Password is required"],
+        default: "",
+      },
+      photoId: { type: String, default: "" },
     },
-    posts: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Post",
-        }
-    ],
-    following: [
-        {
-            followedUser: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        }
-    ],
-    followers: [
-        {
-            followerUser: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        }
-    ],
-    notifications: [
-        {
-            senderId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-            action: {
-                type: String,
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now,
-            },
-            read: {
-                type: Boolean,
-                default: false,
-            },
-            viewProfile: {
-                type: Boolean,
-                default: false,
-            }
-        }
-    ],
-    chatList: [
-        {
-            receiverId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-            messageId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Message",
-            },
-        }
-    ],
+  ],
 });
 
 const User = mongoose.model("User", userSchema);

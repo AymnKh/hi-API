@@ -5,7 +5,6 @@ import Http from "http-status-codes";
 export async function sendMessage(req, res) {
   const senderId = req.user._id;
   const receiverId = req.body.receiverId;
-
   const findConversation = await Conversation.find({
     $or: [
       {
@@ -26,7 +25,6 @@ export async function sendMessage(req, res) {
       },
     ],
   });
-  console.log(findConversation);
   if (findConversation.length >= 1) {
     await Message.updateOne(
       {
@@ -171,19 +169,21 @@ export async function markAllAsRead(req, res) {
     const message = await Message.findOne({
       conversationId: conversation._id,
     });
-   
+
     try {
-      message.messages.forEach(async element => {
+      message.messages.forEach(async (element) => {
         await Message.updateOne(
           {
             "messages._id": element._id,
           },
           { $set: { "messages.$.isRead": true } } //  $ first index match the query condition
         );
-      })
+      });
       return res.status(Http.OK).json({ message: "Messages marked as read" });
     } catch (err) {
-     return res.status(Http.INTERNAL_SERVER_ERROR).json({ message: "Error occured" });
+      return res
+        .status(Http.INTERNAL_SERVER_ERROR)
+        .json({ message: "Error occured" });
     }
   }
 }

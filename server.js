@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import _ from 'lodash';
+import _ from "lodash";
 
 const app = express();
 // socket.io
@@ -65,6 +65,10 @@ app.use("/api/friends", friendsRoutes);
 //message middleware
 import messageRoutes from "./routes/message.js";
 app.use("/api", messageRoutes);
+//photo middleware
+import photoRoutes from "./routes/photo.js";
+
+app.use("/api", photoRoutes);
 
 const port = 3000;
 
