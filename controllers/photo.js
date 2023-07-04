@@ -19,8 +19,7 @@ export function uploadPhoto(req, res) {
       },
     },
     async (err, result) => {
-      console.log(result);
-      User.updateOne(
+      await User.updateOne(
         { _id: req.user._id },
         {
           $push: {
@@ -41,4 +40,49 @@ export function uploadPhoto(req, res) {
         });
     }
   );
+}
+
+export function setProfile(req, res) {
+  const { photoId, photoVersion } = req.params;
+  User.updateOne(
+    { _id: req.user._id },
+    {
+      photoId: photoId,
+      photoVersion: photoVersion,
+    }
+  )
+    .then(() => {
+      return res.status(Http.OK).json({ message: "photo updated" });
+    })
+    .catch((err) => {
+      return res
+        .status(Http.INTERNAL_SERVER_ERROR)
+        .json({ message: "photo not updated" });
+    });
+}
+
+export function deletePhoto(req, res) {
+  const { photoId } = req.params;
+  cloudinary.uploader.destroy(photoId, async (err, result) => {
+    if (result.result === "ok") {
+      await User.updateOne(
+        { _id: req.user._id },
+        {
+          $pull: {
+            photos: {
+              photoId: photoId,
+            },
+          },
+        }
+      )
+        .then(() => {
+          return res.status(Http.OK).json({ message: "photo deleted" });
+        })
+        .catch((err) => {
+          return res
+            .status(Http.INTERNAL_SERVER_ERROR)
+            .json({ message: "photo not deleted" });
+        });
+    }
+  });
 }

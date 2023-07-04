@@ -6,7 +6,7 @@ export function addPost(req, res) {
   const newPost = new Post({
     // create a new post object
     post: req.body.post, // get the post from the request body
-    userId: req.user.userId, // get the userId from the request user object
+    userId: req.user._id, // get the userId from the request user object
     username: req.user.username, // get the username from the request user object
   });
   Post.create(newPost)

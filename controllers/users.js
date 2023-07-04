@@ -22,6 +22,7 @@ export function getUser(req, res) {
     .populate("posts")
     .populate("chatList.receiverId")
     .populate("chatList.messageId")
+    .populate("notifications.senderId")
     .then((user) => {
       if (!user)
         return res.status(Http.NOT_FOUND).json({ message: "No user found" }); // return error message

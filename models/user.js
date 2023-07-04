@@ -78,9 +78,9 @@ const userSchema = mongoose.Schema({
   ],
   photoVersion: {
     type: String,
-    default: "",
+    default: "1687878287",
   },
-  photoId: { type: String, default: "" },
+  photoId: { type: String, default: "default_yaqurq.jpg" },
   photos: [
     {
       photoVersion: {
