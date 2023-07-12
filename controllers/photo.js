@@ -3,8 +3,8 @@ import User from "../models/user.js";
 import Http from "http-status-codes";
 cloudinary.config({
   cloud_name: "des1acmba",
-  api_key: "597783537724436",
-  api_secret: "64N2vOAFwI34jjSvoMMXCY3emzk",
+  api_key: "641759972817119",
+  api_secret: "md1SggQFFuhj9za6Hbsue0JAkKo",
 });
 export function uploadPhoto(req, res) {
   const photo = req.body.photo;

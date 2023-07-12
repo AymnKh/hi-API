@@ -1,44 +1,104 @@
 import Post from "../models/post.js";
 import Http from "http-status-codes";
 import User from "../models/user.js";
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: "des1acmba",
+  api_key: "641759972817119",
+  api_secret: "md1SggQFFuhj9za6Hbsue0JAkKo",
+});
 export function addPost(req, res) {
   // addPost function
-  const newPost = new Post({
-    // create a new post object
-    post: req.body.post, // get the post from the request body
-    userId: req.user._id, // get the userId from the request user object
-    username: req.user.username, // get the username from the request user object
-  });
-  Post.create(newPost)
-    .then(async (post) => {
-      // save the post
-      const userUpdated = await User.updateOne(
-        {
-          _id: req.user._id, // get the userId from the request user object
-        },
-        {
-          $push: {
-            posts: post._id, // push the post id to the user posts array
-          },
-        }
-      ); // update the user
-      if (!userUpdated) {
-        // if the user update fails
-        return res.status(Http.INTERNAL_SERVER_ERROR).json({
-          message: "Error while updating user", // return an error message
-        });
-      }
-      return res.status(Http.CREATED).json({
-        message: "Post created successfully", // return a success message
-        post: post,
-      });
-    })
-    .catch((err) => {
-      return res.status(Http.INTERNAL_SERVER_ERROR).json({
-        message: "Error while creating post", // return an error message
-        error: err._message,
-      });
+  if (req.body.post.post && !req.body.post.photo) {
+    const newPost = new Post({
+      // create a new post object
+      post: req.body.post.post, // get the post from the request body
+      userId: req.user._id, // get the userId from the request user object
+      username: req.user.username, // get the username from the request user object
     });
+    Post.create(newPost)
+      .then(async (post) => {
+        // save the post
+        const userUpdated = await User.updateOne(
+          {
+            _id: req.user._id, // get the userId from the request user object
+          },
+          {
+            $push: {
+              posts: post._id, // push the post id to the user posts array
+            },
+          }
+        ); // update the user
+        if (!userUpdated) {
+          // if the user update fails
+          return res.status(Http.INTERNAL_SERVER_ERROR).json({
+            message: "Error while updating user", // return an error message
+          });
+        }
+        return res.status(Http.CREATED).json({
+          message: "Post created successfully", // return a success message
+          post: post,
+        });
+      })
+      .catch((err) => {
+        return res.status(Http.INTERNAL_SERVER_ERROR).json({
+          message: "Error while creating post", // return an error message
+          error: err._message,
+        });
+      });
+  }
+  if (req.body.post.post && req.body.post.photo) {
+    const photo = req.body.post.photo;
+    cloudinary.uploader.upload(
+      photo,
+      {
+        transformation: {
+          width: 500,
+          height: 500,
+        },
+      },
+      async (err, result) => {
+        const newPost = new Post({
+          // create a new post object
+          post: req.body.post.post, // get the post from the request body
+          userId: req.user._id, // get the userId from the request user object
+          username: req.user.username, // get the username from the request user object
+          photoVersion: result.version, // get photo verison
+          photoId: result.public_id, //photo id
+        });
+        Post.create(newPost)
+          .then(async (post) => {
+            // save the post
+            const userUpdated = await User.updateOne(
+              {
+                _id: req.user._id, // get the userId from the request user object
+              },
+              {
+                $push: {
+                  posts: post._id, // push the post id to the user posts array
+                },
+              }
+            ); // update the user
+            if (!userUpdated) {
+              // if the user update fails
+              return res.status(Http.INTERNAL_SERVER_ERROR).json({
+                message: "Error while updating user", // return an error message
+              });
+            }
+            return res.status(Http.CREATED).json({
+              message: "Post created successfully", // return a success message
+              post: post,
+            });
+          })
+          .catch((err) => {
+            return res.status(Http.INTERNAL_SERVER_ERROR).json({
+              message: "Error while creating post", // return an error message
+              error: err._message,
+            });
+          });
+      }
+    );
+  }
 } // addPost function
 export function getPosts(req, res) {
   Post.find({}) // get all posts
