@@ -159,7 +159,7 @@ export function addComment(req, res) {
     {
       $push: {
         comments: {
-          userId: req.user.userId, // push the userId to the comments array
+          userId: req.user._id, // push the userId to the comments array
           username: req.user.username, // push the username to the comments array
           comment: req.body.comment, // push the comment to the comments array
         },
