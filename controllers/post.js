@@ -199,3 +199,49 @@ export function getPost(req, res) {
       });
     });
 }
+
+export function editPost(req, res) {
+  const { id, post } = req.body; // get the postId from the request and post
+  console.log(id);
+  Post.findByIdAndUpdate(id, { post: post }, { new: true }) // update
+    .then((newPost) => {
+      return res.status(Http.OK).json({
+        message: "Post edited successfully", // return a success message
+        updatedPost: newPost,
+      });
+    })
+    .catch((err) => {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        message: "Error while editing post", // return an error message
+        error: err._message,
+      });
+    });
+}
+
+export async function deletePost(req, res) {
+  const postId = req.params.postId; // get the postId from the request params
+  const deletePost = await Post.findByIdAndDelete(postId);
+  if (!deletePost) {
+    return res.status(Http.INTERNAL_SERVER_ERROR).json({
+      message: "Error while deleting post", // return an error message
+    });
+  } else {
+    const updateUser = await User.updateOne( 
+      { _id: req.user._id },
+      {
+        $pull: { // pull the ppost from posts array in user
+          posts: postId,
+        },
+      }
+    );
+    if (!updateUser) {
+      return res.status(Http.INTERNAL_SERVER_ERROR).json({
+        message: "Error while deleting post", // return an error message
+      });
+    } else {
+      return res.status(Http.OK).json({
+        message: "Post deleted successfully", // return a success message
+      });
+    }
+  }
+}
